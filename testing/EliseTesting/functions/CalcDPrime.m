@@ -1,4 +1,4 @@
-function [Dprime] = CalcDPrime(i, j, n, meanresults, stdevresults)
+function [Dprime] = CalcDPrime(i, j, n, dMeanresults, stdevresults)
 
 %This function calculates d' between one folder, subject, or electrode and
 %all others input
@@ -20,7 +20,7 @@ n_max = n + 1;
 
 %Prints means and corresponding subject and channel
 %fprintf(append('Mean of ', channel{i_1}, ' in subject ', subject{n_1}, ' is '));
-meanresults(1,1,1)
+dMeanresults(1,1,1)
 
 %fprintf(append('Mean of ', channel{i_2}, ' in subject ', subject{n_2}, ' is ' ));
 %meanresults(1, 2, 1)
@@ -46,7 +46,7 @@ m = 0;
 %First loop goes from 1 to folder selected
 while j ~= j_1 && j < j_max
     m = 0;
-    m = m + meanresults(i, j, n);
+    m = m + dMeanresults(i, j, n);
     j = j + 1;
 end
 %Second loop makes sure selected folder isn't included in sum
@@ -55,12 +55,12 @@ while j == j_1
 end
 %Last loop goes from selected folder to the end
 while j ~= j_1 && j < j_max 
-    m = m + meanresults(i, j, n);
+    m = m + dMeanresults(i, j, n);
     j = j + 1;
 end
 
 %Calculates the numerator
-numerator = meanresults(1, 1, 1) - ((1/N)*m);
+numerator = dMeanresults(1, 1, 1) - ((1/N)*m);
 
 
 %Reset i, j, and n for looping again
@@ -74,7 +74,7 @@ s = 0;
 %First loop goes from 1 to folder selected
 while j ~= j_1 && j < j_max
     s = 0;
-    s = s + ((stdevresults(i, j, n))^2);
+    s = s + ((stdevresults(i, j, n)));
     j = j + 1;
 end
 %Second loop makes sure selected folder isn't included in sum
@@ -83,11 +83,11 @@ while j == j_1
 end
 %Last loop goes from selected folder to the end
 while j ~= j_1 && j < j_max
-    s = s + ((stdevresults(i, j, n))^2);
+    s = s + ((stdevresults(i, j, n)));
     j = j + 1;
 end
 
-denominator = sqrt(0.5*(((stdev_1)^2) + (1/N)*s));
+denominator = sqrt(0.5*(((stdev_1)) + (1/N)*s));
 
 %This calculates the values of d'
 Dprime = numerator/denominator;

@@ -1,4 +1,4 @@
-function [meanavgBB,peakavgBB, ttavgBB, stdev] = newFolderAverageBBfunction(localDataPath, ...
+function [meanavgBB,peakavgBB, dMean, stdev] = newFolderAverageBBfunction(localDataPath, ...
     nameFolder, subjectcurrent, channelcurrent, graphtttmin, graphtttmax,...
     meanttmin, meanttmax, notf, plotBB, meanBB, ...
     tt, all_channels, eventsST, New_Mbb_Norm, colors, titles, folders)
@@ -137,9 +137,9 @@ function [meanavgBB,peakavgBB, ttavgBB, stdev] = newFolderAverageBBfunction(loca
     
 
    currentImages = squeeze(New_Mbb_Norm(channel, :, imageNumberShown));
-   ttcurrentImages = currentImages((tt>=meanttmin & tt<=meanttmax), :, :);
+   ttcurrentImages = currentImages(find(tt>=meanttmin & tt<=meanttmax), :, :);
    meanImages = mean(ttcurrentImages, 1);
-   stdev = std(meanImages);
-
+   stdev = var(meanImages, 1, 'omitnan');
+   dMean = mean(meanImages);
 end
 

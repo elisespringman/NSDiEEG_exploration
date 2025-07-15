@@ -32,10 +32,10 @@ meanttmax = 0.8;
 folderName = {'Food', 'Random'};
 
 %Subject to be used
-subject = {'12'};                      
+subject = {'13'};                      
 
 %Channels to be tested
-channel = ["RO4"];
+channel = ["RT1"];
 
 %Establishes plot options
 colors = {'-b', '-r', '-c', '-m'};
@@ -107,7 +107,7 @@ for j = 1:length(folderName) %Loop for folders
         channelIdx = find(ismember([all_channels.name],channel{i}));
 
         %finds the mean and peak value between 0 and 0.2
-        [meanbb, peakbb, ttavgBB, stdev] = newFolderAverageBBfunction(localDataPath, currentFolder,...
+        [meanbb, peakbb, dMean, stdev] = newFolderAverageBBfunction(localDataPath, currentFolder,...
             currentsubject, channelIdx, graphttmin, graphttmax, meanttmin, meanttmax, NotFolder, plotBBvalues, findmean, ...
             tt, all_channels, eventsST, New_Mbb_Norm, currentcolor, channel(i));
 
@@ -129,17 +129,19 @@ for j = 1:length(folderName) %Loop for folders
         %stdevresults(i, j, n) = stdev;
         stdev
         stdevresults(i, j) = stdev;
+        
+        dMeanresults(i, j) = dMean;
 
     end
 end
 
 %Calculates and prints d'
-[Dprime] = CalcDPrime(i, j, n, meanresults, stdevresults);
+[Dprime] = CalcDPrime(i, j, n, dMeanresults, stdevresults);
 Dprime
 
 %Add a legend to the plot - this doesn't always work right
-if plotBBvalues == 1
-    legend(folderName)
-end
+%if plotBBvalues == 1
+    %legend(folderName)
+%end
 
 
