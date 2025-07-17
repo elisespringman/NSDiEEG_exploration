@@ -1,16 +1,10 @@
-%Original code written by Annika
-%Elise Springman made a few chagnes for my specific project
+%Using this code to calculate fixed d'
 
-%Calculates and plots the average BB signal for a selected folder(s) of
-%images and outputs mean, peak, standard deviation, and d'
-
-%This variation loops through multiple subjects for comparison
 %% Creates Path
 
 clear;
 
 localDataPath = setLocalDataPath(1);
-
 
 %% Set variables 
 
@@ -19,7 +13,7 @@ localDataPath = setLocalDataPath(1);
 NotFolder = 0;  
 
 % 1 to plot BB values, 0 to skip
-plotBBvalues = 1;
+plotBBvalues = 0;
 graphttmin = -0.1;
 graphttmax = 0.8;
 
@@ -29,13 +23,14 @@ meanttmin = 0;
 meanttmax = 0.8;
 
 %folder to be averaged
-folderName = {'ColorRandom', 'DullRandom'};
+folderName = {'Food', 'Random'};
 
 %Subject to be used
-subject = {'20'};                      
+subject = {'13'};                      
 
 %Channels to be tested
-channel = ["LT7"];
+channel = ["RT1", "RT2", "RT3", "RT4", "RT5", "RT6", ...
+    "ROI5", "ROI6", "ROI7"];
 
 %Establishes plot options
 colors = {'-b', '-r', '-c', '-m'};
@@ -66,41 +61,38 @@ n = 1;
 %Set subject
     subjects = {subject};
     % Choose an analysis type:
-    desc_label = 'normalized_MbbPerRun'; %new normalized data
+    desc_label = 'New_Mbb_norm'; %new normalized data
      
     ss = 1;
     subj = subject{ss};
     currentsubject = subject{ss};
-
-  
+    
 %% Loads the data for the subject
     % Load NSD-iEEG-broadband data
     % dataFitName = fullfile(['sub-' subj],['sub-' subj '_desc-' desc_label '_ieeg.mat']);
     
     %Loads old data to access all subject information
-    %oldData = fullfile(localDataPath.input,'preproc-car', ['sub-' currentsubject],...
-    %['sub-' currentsubject '_desc-preprocCARBB_ieeg.mat']);
-    %load(oldData)
+    oldData = fullfile(localDataPath.input,'preproc-car', ['sub-' currentsubject],...
+    ['sub-' currentsubject '_desc-preprocCARBB_ieeg.mat']);
+    load(oldData)
     
     %Loads new normalized data
     dataFitName = fullfile(localDataPath.input,'preproc-car', ['sub-' currentsubject],...
     ['sub-' currentsubject '_desc-' desc_label '_ieeg.mat']);
     load(dataFitName)
- 
-%% Calls the folderAverageBBfunction for each given electrode
-%This code uses the new normalized data
-
-for j = 1:length(folderName) %Loop for folders
-
-    %Sets current folder to be input folderAverageBB
-    currentFolder = folderName{j};
+    
+%% 
+for i = 1:length(channel) %Loop for electrodes
 
 
-    for i = 1:length(channel) %Loop for electrodes
+    for j = 1:length(folderName) %Loop for folders
 
         %Sets line color and marking to distiguish lines - this only
         %distigushes between folders
         currentcolor = colors{j};
+        
+        %Sets current folder to be input folderAverageBB
+        currentFolder = folderName{j};
 
         % States which channel it is currently processing
         channel{i};
@@ -110,38 +102,21 @@ for j = 1:length(folderName) %Loop for folders
         [meanbb, peakbb, dMean, stdev] = newFolderAverageBBfunction(localDataPath, currentFolder,...
             currentsubject, channelIdx, graphttmin, graphttmax, meanttmin, meanttmax, NotFolder, plotBBvalues, findmean, ...
             tt, all_channels, eventsST, New_Mbb_Norm, currentcolor, channel(i));
-
-
-
-        % Stores then prints the mean calculated above
-        meanresults(i,j)   = meanbb;
-
-        fprintf(append('The mean from ', num2str(meanttmin), ' to ', num2str(meanttmax), 'is:'));
-        meanbb
-
-        % Stores then prints the peak calculated above
-        peakresults(i,j)   = peakbb;
-
-        fprintf(append('The peak from ', num2str(meanttmin), ' to ', num2str(meanttmax), 'is:'));
-        peakbb
-
+        
+        
         %stdev = std(ttavgBB)
         %stdevresults(i, j, n) = stdev;
-        stdev
         stdevresults(i, j) = stdev;
+        stdev
         
         dMeanresults(i, j) = dMean;
-
-    end
+        
+    end 
+    
+    %Calculates and prints d'
+    [Dprime] = CalcDPrime(i, j, n, dMeanresults, stdevresults);
+     Prime(i) = Dprime';
+     rePrime = Prime';
 end
 
-%Calculates and prints d'
-[Dprime] = CalcDPrime(i, j, n, dMeanresults, stdevresults);
-Dprime
-
-%Add a legend to the plot - this doesn't always work right
-if plotBBvalues == 1
-    legend(folderName)
-end
-
-
+        

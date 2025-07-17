@@ -9,9 +9,9 @@ function [Dprime] = CalcDPrime(i, j, n, dMeanresults, stdevresults)
 %Information for the first mean - j
 %Change these variables to match the subject, folder, and electrode you
 %would like to look at
-i_1 = 1;
-j_1 = 1;
-n_1 = 1;
+i_1 = i-1;
+j_1 = j-1;
+n_1 = n-1;
 
 %Information for max bounds
 i_max = i + 1;
@@ -20,7 +20,7 @@ n_max = n + 1;
 
 %Prints means and corresponding subject and channel
 %fprintf(append('Mean of ', channel{i_1}, ' in subject ', subject{n_1}, ' is '));
-dMeanresults(1,1,1)
+dMeanresults(i,j_1)
 
 %fprintf(append('Mean of ', channel{i_2}, ' in subject ', subject{n_2}, ' is ' ));
 %meanresults(1, 2, 1)
@@ -29,13 +29,13 @@ dMeanresults(1,1,1)
 N = j - 1;
 
 %Standard deviation for each mean - this might be wrong
-stdev_1 = stdevresults(1,1,1);
+stdev_1 = stdevresults(i,j_1);
 %stddev_2 = stdevresults(1, 2, 1);
 
 %Reset i, j, and n for looping
-i = 1;
-j = 1;
-n = 1;
+%i = 1;
+j = j_1;
+%n = 1;
 
 %Sets m for loop
 m = 0;
@@ -46,7 +46,7 @@ m = 0;
 %First loop goes from 1 to folder selected
 while j ~= j_1 && j < j_max
     m = 0;
-    m = m + dMeanresults(i, j, n);
+    m = m + dMeanresults(i, j);
     j = j + 1;
 end
 %Second loop makes sure selected folder isn't included in sum
@@ -55,18 +55,18 @@ while j == j_1
 end
 %Last loop goes from selected folder to the end
 while j ~= j_1 && j < j_max 
-    m = m + dMeanresults(i, j, n);
+    m = m + dMeanresults(i, j);
     j = j + 1;
 end
 
 %Calculates the numerator
-numerator = dMeanresults(1, 1, 1) - ((1/N)*m);
+numerator = dMeanresults(i, j_1) - ((1/N)*m);
 
 
 %Reset i, j, and n for looping again
-i = 1;
-j = 1;
-n = 1;
+%i = 1;
+j = j_1;
+%n = 1;
 
 %Sets s for loops
 s = 0;
@@ -74,7 +74,7 @@ s = 0;
 %First loop goes from 1 to folder selected
 while j ~= j_1 && j < j_max
     s = 0;
-    s = s + ((stdevresults(i, j, n)));
+    s = s + ((stdevresults(i, j)));
     j = j + 1;
 end
 %Second loop makes sure selected folder isn't included in sum
@@ -83,7 +83,7 @@ while j == j_1
 end
 %Last loop goes from selected folder to the end
 while j ~= j_1 && j < j_max
-    s = s + ((stdevresults(i, j, n)));
+    s = s + ((stdevresults(i, j)));
     j = j + 1;
 end
 

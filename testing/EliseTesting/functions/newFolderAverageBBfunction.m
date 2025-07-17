@@ -122,6 +122,7 @@ function [meanavgBB,peakavgBB, dMean, stdev] = newFolderAverageBBfunction(localD
         avgBB = mean(BBvalues,2);
         
         %ttavgBB = mean(ttBBvalues);
+        ttavgBB = avgBB(tt>=graphtttmin & tt<=graphtttmax);
     
         %Returns the mean
         meanavgBB=mean(ttavgBB);
