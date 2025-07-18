@@ -3,6 +3,8 @@ function [Dprime] = CalcDPrime(i, j, n, dMeanresults, stdevresults)
 %This function calculates d' between one folder, subject, or electrode and
 %all others input
 
+%Works best for only two folders
+
 %Can be adjusted to do comparisons between electrodes and subjects too by
 %exchanging j's for i's or n's
 

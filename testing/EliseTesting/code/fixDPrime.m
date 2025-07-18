@@ -1,4 +1,8 @@
 %Using this code to calculate fixed d'
+%Calculates a bunch of d' values at once
+
+%Similar to main funtions of newSingleSubjwithDPrime but this only
+%outputs d' values
 
 %% Creates Path
 

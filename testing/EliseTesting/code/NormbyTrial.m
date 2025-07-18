@@ -1,8 +1,33 @@
-%%
+%% Set Path
+
+clear;
+
+localDataPath = setLocalDataPath(1);
+
+%% Set variables
+
+%Subject to be used
+subject = {'20'};    
+
+%Set subject
+    subjects = {subject};
+    % Choose an analysis type:
+    desc_label = 'normalized_MbbPerRun'; %new normalized data
+     
+    ss = 1;
+    subj = subject{ss};
+    currentsubject = subject{ss};
+    
+oldData = fullfile(localDataPath.input,'preproc-car', ['sub-' currentsubject],...
+    ['sub-' currentsubject '_desc-preprocCARBB_ieeg.mat']);
+load(oldData)
+    
 sel_events = eventsST;
  
 % extract relevant information from events file:
 [events_status,nsd_idx,shared_idx,nsd_repeats] = ieeg_nsdParseEvents(sel_events);
+
+%% 
 
 Mbb_norm = log10(Mbb);
 

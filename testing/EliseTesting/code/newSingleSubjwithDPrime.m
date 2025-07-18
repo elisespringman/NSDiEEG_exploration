@@ -16,7 +16,10 @@ localDataPath = setLocalDataPath(1);
 
 
 % 0 for all images in folder, 1 for all images in the 1000 besides what is in this folder
-NotFolder = 0;  
+NotFolder = 0; 
+
+% 0 for graphing electrodes on their own graph
+allElectrode = 0;
 
 % 1 to plot BB values, 0 to skip
 plotBBvalues = 1;
@@ -29,17 +32,20 @@ meanttmin = 0;
 meanttmax = 0.8;
 
 %folder to be averaged
-folderName = {'ColorRandom', 'DullRandom'};
+folderName = {'DullFood', 'DullRandom'};
 
 %Subject to be used
-subject = {'20'};                      
+subject = {'13'};                      
 
 %Channels to be tested
-channel = ["LT7"];
+channel = ["RT1", "RT2", "RT3", "RT4", "RT5", "RT6",...
+    "ROI5", "ROI6", "ROI7"];
 
 %Establishes plot options
 colors = {'-b', '-r', '-c', '-m'};
 dashed = {'-+b', '-+r', '-+c', '-+m'};
+legendColors = {[0 0 1], [1 0 0], [0 1 1], [1 0 1]};  % Blue, red, cyan, magenta
+
     
 % "LOC3", "LOC4", "LOC5"};
 
@@ -66,7 +72,7 @@ n = 1;
 %Set subject
     subjects = {subject};
     % Choose an analysis type:
-    desc_label = 'normalized_MbbPerRun'; %new normalized data
+    desc_label = 'normalizedMbbPerRun'; %new normalized data
      
     ss = 1;
     subj = subject{ss};
@@ -90,17 +96,21 @@ n = 1;
 %% Calls the folderAverageBBfunction for each given electrode
 %This code uses the new normalized data
 
-for j = 1:length(folderName) %Loop for folders
+for i = 1:length(channel) %Loop for electrodes
 
-    %Sets current folder to be input folderAverageBB
-    currentFolder = folderName{j};
+    %Creates new graph for each electrode
+    if (allElectrode == 0) && (plotBBvalues == 1)
+        figure;
+    end
 
-
-    for i = 1:length(channel) %Loop for electrodes
+    for j = 1:length(folderName) %Loop for folders
 
         %Sets line color and marking to distiguish lines - this only
         %distigushes between folders
         currentcolor = colors{j};
+        
+        %Sets current folder to be input folderAverageBB
+        currentFolder = folderName{j};
 
         % States which channel it is currently processing
         channel{i};
@@ -109,7 +119,7 @@ for j = 1:length(folderName) %Loop for folders
         %finds the mean and peak value between 0 and 0.2
         [meanbb, peakbb, dMean, stdev] = newFolderAverageBBfunction(localDataPath, currentFolder,...
             currentsubject, channelIdx, graphttmin, graphttmax, meanttmin, meanttmax, NotFolder, plotBBvalues, findmean, ...
-            tt, all_channels, eventsST, New_Mbb_Norm, currentcolor, channel(i));
+            tt, all_channels, eventsST, Mbb_Norm_Run, currentcolor, channel(i));
 
 
 
@@ -133,15 +143,36 @@ for j = 1:length(folderName) %Loop for folders
         dMeanresults(i, j) = dMean;
 
     end
+    
+    %Calculates and prints d'
+    [Dprime] = CalcDPrime(i, j, n, dMeanresults, stdevresults);
+    Prime(i) = Dprime;
+    rePrime = Prime';
+
+    %Add a legend to the plot - this doesn't always work right
+    if (allElectrode == 0) && (plotBBvalues == 1)
+        % Create invisible dummy lines for the legend
+    hold on;
+    legendHandles = gobjects(length(folderName), 1);  % Preallocate graphics handles
+
+    for j = 1:length(folderName)
+        legendHandles(j) = plot(nan, nan, '-', 'Color', legendColors{j}, 'LineWidth', 2);
+    end
+
+    legend(legendHandles, folderName, 'Interpreter', 'none');
+    
+
+    end
+    
 end
 
 %Calculates and prints d'
-[Dprime] = CalcDPrime(i, j, n, dMeanresults, stdevresults);
-Dprime
+%[Dprime] = CalcDPrime(i, j, n, dMeanresults, stdevresults);
+%Dprime
 
 %Add a legend to the plot - this doesn't always work right
-if plotBBvalues == 1
-    legend(folderName)
-end
+%if plotBBvalues == 1
+ %   legend(folderName)
+%end
 
 
