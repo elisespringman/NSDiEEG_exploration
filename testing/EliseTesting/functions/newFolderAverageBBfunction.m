@@ -90,19 +90,25 @@ function [meanavgBB,peakavgBB, dMean, stdev] = newFolderAverageBBfunction(localD
             graphSEM(1,i)=(std(ttBBvalues(i,:)))/sqrt(length(ttBBvalues(i,:)));
         end
         
-    
+        
         %Averages all of the BBValues of the images in the folder
         avgBB = mean(BBvalues,2);
         
         ttavgBB = avgBB(tt>=graphtttmin & tt<=graphtttmax);
+        
+        %Calculating 95% confidence intervals - currently not working
+        %ttavgflip = ttavgBB'; %have to flip ttavgBB for errors
+        %tttflip = ttt';
+        %[h,conf] = ieeg_plotCurvConf(ttt, ttavgflip);
 
         plot(ttt, ttavgBB)
+        set(gca, 'FontSize', 14)
         shadedErrorBar(ttt, ttavgBB, graphSEM, 'lineprops', colors, 'patchSaturation', 0.15)
-        ylim([0,1]);hold on;
+        ylim([-0.2,1]); hold on;
         
-        title(titles)
-        xlabel('Time(s)')
-        ylabel('Broadband Power (Signal Change)'); hold on;
+        title(titles, 'FontSize', 18)
+        xlabel('Time(s)', 'FontSize', 16)
+        ylabel('Broadband Power (Signal Change)', 'Fontsize', 16); hold on;
     end
 
     if findmean == 1

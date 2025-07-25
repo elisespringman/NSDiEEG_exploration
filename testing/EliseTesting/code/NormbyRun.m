@@ -7,7 +7,7 @@ localDataPath = setLocalDataPath(1);
 %% Set variables
 
 %Subject to be used
-subject = {'20'};    
+subject = {'02'};    
 
 %Set subject
     subjects = {subject};

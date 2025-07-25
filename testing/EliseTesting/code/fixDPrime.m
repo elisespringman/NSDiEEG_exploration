@@ -23,8 +23,8 @@ graphttmax = 0.8;
 
 % 1 to find the mean of BB values over 0 to 0.2, 0 to skip
 findmean = 1; 
-meanttmin = 0;
-meanttmax = 0.8;
+meanttmin = 0.15;
+meanttmax = 0.4;
 
 %folder to be averaged
 folderName = {'Food', 'Random'};
@@ -33,8 +33,9 @@ folderName = {'Food', 'Random'};
 subject = {'13'};                      
 
 %Channels to be tested
-channel = ["RT1", "RT2", "RT3", "RT4", "RT5", "RT6", ...
-    "ROI5", "ROI6", "ROI7"];
+%channel = string({all_channels.name}); 
+
+
 
 %Establishes plot options
 colors = {'-b', '-r', '-c', '-m'};
@@ -50,8 +51,8 @@ dashed = {'-+b', '-+r', '-+c', '-+m'};
 
 %Stores results, column 1 is avg and column 2 is peak
 %results = zeros(length(channel), 2);
-meanresults = zeros(length(channel), length(folderName));
-peakresults = zeros(length(channel), length(folderName));
+%meanresults = zeros(length(channel), length(folderName));
+%peakresults = zeros(length(channel), length(folderName));
 
 
 % Maximum time to be plotted (mean is between 0 and 0.2)
@@ -65,7 +66,7 @@ n = 1;
 %Set subject
     subjects = {subject};
     % Choose an analysis type:
-    desc_label = 'New_Mbb_norm'; %new normalized data
+    desc_label = 'normalizedMbbPerRun'; %new normalized data
      
     ss = 1;
     subj = subject{ss};
@@ -76,9 +77,9 @@ n = 1;
     % dataFitName = fullfile(['sub-' subj],['sub-' subj '_desc-' desc_label '_ieeg.mat']);
     
     %Loads old data to access all subject information
-    oldData = fullfile(localDataPath.input,'preproc-car', ['sub-' currentsubject],...
-    ['sub-' currentsubject '_desc-preprocCARBB_ieeg.mat']);
-    load(oldData)
+    %oldData = fullfile(localDataPath.input,'preproc-car', ['sub-' currentsubject],...
+    %['sub-' currentsubject '_desc-preprocCARBB_ieeg.mat']);
+    %load(oldData)
     
     %Loads new normalized data
     dataFitName = fullfile(localDataPath.input,'preproc-car', ['sub-' currentsubject],...
@@ -86,7 +87,14 @@ n = 1;
     load(dataFitName)
     
 %% 
-for i = 1:length(channel) %Loop for electrodes
+
+clearvars dMeanresults
+clearvars stdevresults
+clearvars Prime
+clearvars rePrime
+
+
+for i = 1:length(all_channels.name) %Loop for electrodes
 
 
     for j = 1:length(folderName) %Loop for folders
@@ -99,13 +107,14 @@ for i = 1:length(channel) %Loop for electrodes
         currentFolder = folderName{j};
 
         % States which channel it is currently processing
-        channel{i};
+        channel(i) = all_channels.name(i);
         channelIdx = find(ismember([all_channels.name],channel{i}));
-
+         
+        
         %finds the mean and peak value between 0 and 0.2
         [meanbb, peakbb, dMean, stdev] = newFolderAverageBBfunction(localDataPath, currentFolder,...
             currentsubject, channelIdx, graphttmin, graphttmax, meanttmin, meanttmax, NotFolder, plotBBvalues, findmean, ...
-            tt, all_channels, eventsST, New_Mbb_Norm, currentcolor, channel(i));
+            tt, all_channels, eventsST, Mbb_Norm_Run, currentcolor, all_channels.name(i));
         
         
         %stdev = std(ttavgBB)
@@ -117,9 +126,18 @@ for i = 1:length(channel) %Loop for electrodes
         
     end 
     
-    %Calculates and prints d'
-    [Dprime] = CalcDPrime(i, j, n, dMeanresults, stdevresults);
-     Prime(i) = Dprime';
+    %Accounts for status of electrode
+    if all_channels.status(i) == 0
+         continue
+    elseif all_channels.status(i) == 1
+        %Calculates and prints d'
+        [Dprime] = CalcDPrime(i, j, n, dMeanresults, stdevresults);
+         Prime(i) = Dprime;
+    end
+    
+    %Calculates and prints d' for all electrodes
+    %[Dprime] = CalcDPrime(i, j, n, dMeanresults, stdevresults);
+     %Prime(i) = Dprime;
      rePrime = Prime';
 end
 

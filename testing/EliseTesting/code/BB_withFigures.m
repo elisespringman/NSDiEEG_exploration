@@ -46,7 +46,7 @@ sel_events = eventsST;
 
 %%
 im_path = localDataPath.im;
-channels = {"LO10"};
+channels = {"LA1", "LC7"};
 for1000 = 1; % 0 for 100
 for cc = 1:length(channels)
     channel = string(channels(cc));

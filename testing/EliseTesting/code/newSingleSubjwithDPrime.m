@@ -28,23 +28,22 @@ graphttmax = 0.8;
 
 % 1 to find the mean of BB values over 0 to 0.2, 0 to skip
 findmean = 1; 
-meanttmin = 0;
+meanttmin = 0.4;
 meanttmax = 0.8;
 
 %folder to be averaged
-folderName = {'DullFood', 'DullRandom'};
+folderName = {'Food', 'Random'};
 
 %Subject to be used
-subject = {'13'};                      
+subject = {'02'};                      
 
 %Channels to be tested
-channel = ["RT1", "RT2", "RT3", "RT4", "RT5", "RT6",...
-    "ROI5", "ROI6", "ROI7"];
+channel = ["LO5", "LO6"];
 
 %Establishes plot options
-colors = {'-b', '-r', '-c', '-m'};
-dashed = {'-+b', '-+r', '-+c', '-+m'};
-legendColors = {[0 0 1], [1 0 0], [0 1 1], [1 0 1]};  % Blue, red, cyan, magenta
+colors = {'-r', '-b', '-c', '-m'};
+dashed = {'-+r', '-+b', '-+c', '-+m'};
+legendColors = {[1 0 0], [0 0 1], [0 1 1], [1 0 1]};  % Blue, red, cyan, magenta
 
     
 % "LOC3", "LOC4", "LOC5"};
@@ -116,7 +115,7 @@ for i = 1:length(channel) %Loop for electrodes
         channel{i};
         channelIdx = find(ismember([all_channels.name],channel{i}));
 
-        %finds the mean and peak value between 0 and 0.2
+        %finds the mean and peak values
         [meanbb, peakbb, dMean, stdev] = newFolderAverageBBfunction(localDataPath, currentFolder,...
             currentsubject, channelIdx, graphttmin, graphttmax, meanttmin, meanttmax, NotFolder, plotBBvalues, findmean, ...
             tt, all_channels, eventsST, Mbb_Norm_Run, currentcolor, channel(i));
@@ -159,7 +158,7 @@ for i = 1:length(channel) %Loop for electrodes
         legendHandles(j) = plot(nan, nan, '-', 'Color', legendColors{j}, 'LineWidth', 2);
     end
 
-    legend(legendHandles, folderName, 'Interpreter', 'none');
+    legend(legendHandles, folderName, 'Interpreter', 'none', 'FontSize', 14);
     
 
     end
