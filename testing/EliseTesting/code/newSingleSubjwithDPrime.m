@@ -2,7 +2,7 @@
 %Elise Springman made a few chagnes for my specific project
 
 %Calculates and plots the average BB signal for a selected folder(s) of
-%images and outputs mean, peak, standard deviation, and d'
+%images and outputs mean, peak, and d'
 
 %This variation loops through multiple subjects for comparison
 %% Creates Path
@@ -32,18 +32,21 @@ meanttmin = 0.4;
 meanttmax = 0.8;
 
 %folder to be averaged
-folderName = {'Food', 'Random'};
+folderName = {'DullFood', 'DullRandom'};
 
 %Subject to be used
-subject = {'02'};                      
+subject = {'17'};                      
 
 %Channels to be tested
-channel = ["LO5", "LO6"];
+channel = ["LOC11", "LOC10", "LOC9", "LOC8", "LOC6", "LO7", "LO5", "LO4"];
+
+%["LO4", "LO5", "LO6", "LO7", "LOC5", "LOC6", "LOC7", "LOC8",...
+    %"LOC9", "LOC10", "LOC11", "LT1", "LT2", "LT3"];
 
 %Establishes plot options
 colors = {'-r', '-b', '-c', '-m'};
 dashed = {'-+r', '-+b', '-+c', '-+m'};
-legendColors = {[1 0 0], [0 0 1], [0 1 1], [1 0 1]};  % Blue, red, cyan, magenta
+legendColors = {[1 0 0], [0 0 1], [0 1 1], [1 0 1]};  % Red, blue, cyan, magenta
 
     
 % "LOC3", "LOC4", "LOC5"};
@@ -116,7 +119,7 @@ for i = 1:length(channel) %Loop for electrodes
         channelIdx = find(ismember([all_channels.name],channel{i}));
 
         %finds the mean and peak values
-        [meanbb, peakbb, dMean, stdev] = newFolderAverageBBfunction(localDataPath, currentFolder,...
+        [meanbb, peakbb, dMean, vari] = newFolderAverageBBfunction(localDataPath, currentFolder,...
             currentsubject, channelIdx, graphttmin, graphttmax, meanttmin, meanttmax, NotFolder, plotBBvalues, findmean, ...
             tt, all_channels, eventsST, Mbb_Norm_Run, currentcolor, channel(i));
 
@@ -136,19 +139,19 @@ for i = 1:length(channel) %Loop for electrodes
 
         %stdev = std(ttavgBB)
         %stdevresults(i, j, n) = stdev;
-        stdev
-        stdevresults(i, j) = stdev;
+        vari
+        variresults(i, j) = vari;
         
         dMeanresults(i, j) = dMean;
 
     end
     
     %Calculates and prints d'
-    [Dprime] = CalcDPrime(i, j, n, dMeanresults, stdevresults);
+    [Dprime] = DPrimeTwoFolder(i, j, n, dMeanresults, variresults);
     Prime(i) = Dprime;
     rePrime = Prime';
 
-    %Add a legend to the plot - this doesn't always work right
+    %Add a legend to the plot
     if (allElectrode == 0) && (plotBBvalues == 1)
         % Create invisible dummy lines for the legend
     hold on;
@@ -158,7 +161,7 @@ for i = 1:length(channel) %Loop for electrodes
         legendHandles(j) = plot(nan, nan, '-', 'Color', legendColors{j}, 'LineWidth', 2);
     end
 
-    legend(legendHandles, folderName, 'Interpreter', 'none', 'FontSize', 14);
+    legend(legendHandles, folderName, 'Interpreter', 'none', 'FontSize', 20);
     
 
     end

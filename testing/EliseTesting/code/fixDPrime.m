@@ -89,12 +89,13 @@ n = 1;
 %% 
 
 clearvars dMeanresults
-clearvars stdevresults
+clearvars variresults
 clearvars Prime
 clearvars rePrime
 
 
 for i = 1:length(all_channels.name) %Loop for electrodes
+    %all_channel.name for all electrodes or channels for listed electrodes
 
 
     for j = 1:length(folderName) %Loop for folders
@@ -107,20 +108,20 @@ for i = 1:length(all_channels.name) %Loop for electrodes
         currentFolder = folderName{j};
 
         % States which channel it is currently processing
-        channel(i) = all_channels.name(i);
+        channel(i) = all_channels.name(i); %currentchannel
         channelIdx = find(ismember([all_channels.name],channel{i}));
          
         
-        %finds the mean and peak value between 0 and 0.2
-        [meanbb, peakbb, dMean, stdev] = newFolderAverageBBfunction(localDataPath, currentFolder,...
+        %finds the mean and peak value between meanttmin and meanttmax
+        [meanbb, peakbb, dMean, vari] = newFolderAverageBBfunction(localDataPath, currentFolder,...
             currentsubject, channelIdx, graphttmin, graphttmax, meanttmin, meanttmax, NotFolder, plotBBvalues, findmean, ...
-            tt, all_channels, eventsST, Mbb_Norm_Run, currentcolor, all_channels.name(i));
+            tt, all_channels, eventsST, Mbb_Norm_Run, currentcolor, all_channels.name(i)); %currentchannel
         
         
         %stdev = std(ttavgBB)
         %stdevresults(i, j, n) = stdev;
-        stdevresults(i, j) = stdev;
-        stdev
+        variresults(i, j) = vari;
+        vari
         
         dMeanresults(i, j) = dMean;
         
@@ -131,12 +132,12 @@ for i = 1:length(all_channels.name) %Loop for electrodes
          continue
     elseif all_channels.status(i) == 1
         %Calculates and prints d'
-        [Dprime] = CalcDPrime(i, j, n, dMeanresults, stdevresults);
+        [Dprime] = CalcDPrime(i, j, n, dMeanresults, variresults);
          Prime(i) = Dprime;
     end
     
     %Calculates and prints d' for all electrodes
-    %[Dprime] = CalcDPrime(i, j, n, dMeanresults, stdevresults);
+    %[Dprime] = CalcDPrime(i, j, n, dMeanresults, variresults);
      %Prime(i) = Dprime;
      rePrime = Prime';
 end

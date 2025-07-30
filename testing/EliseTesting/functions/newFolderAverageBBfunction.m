@@ -1,4 +1,4 @@
-function [meanavgBB,peakavgBB, dMean, stdev] = newFolderAverageBBfunction(localDataPath, ...
+function [meanavgBB,peakavgBB, dMean, vari] = newFolderAverageBBfunction(localDataPath, ...
     nameFolder, subjectcurrent, channelcurrent, graphtttmin, graphtttmax,...
     meanttmin, meanttmax, notf, plotBB, meanBB, ...
     tt, all_channels, eventsST, New_Mbb_Norm, colors, titles, folders)
@@ -102,13 +102,14 @@ function [meanavgBB,peakavgBB, dMean, stdev] = newFolderAverageBBfunction(localD
         %[h,conf] = ieeg_plotCurvConf(ttt, ttavgflip);
 
         plot(ttt, ttavgBB)
-        set(gca, 'FontSize', 14)
+        set(gca, 'FontSize', 18)
         shadedErrorBar(ttt, ttavgBB, graphSEM, 'lineprops', colors, 'patchSaturation', 0.15)
-        ylim([-0.2,1]); hold on;
+        ylim([-0.2,1]); 
+        xlim([-0.1,0.8]); hold on;
         
-        title(titles, 'FontSize', 18)
-        xlabel('Time(s)', 'FontSize', 16)
-        ylabel('Broadband Power (Signal Change)', 'Fontsize', 16); hold on;
+        title(titles, 'FontSize', 24)
+        xlabel('Time(s)', 'FontSize', 22)
+        ylabel('Broadband Power (Signal Change)', 'Fontsize', 20); hold on;
     end
 
     if findmean == 1
@@ -146,7 +147,7 @@ function [meanavgBB,peakavgBB, dMean, stdev] = newFolderAverageBBfunction(localD
    currentImages = squeeze(New_Mbb_Norm(channel, :, imageNumberShown));
    ttcurrentImages = currentImages(find(tt>=meanttmin & tt<=meanttmax), :, :);
    meanImages = mean(ttcurrentImages, 1);
-   stdev = var(meanImages, 1, 'omitnan');
+   vari = var(meanImages, 1, 'omitnan');
    dMean = mean(meanImages);
 end
 
