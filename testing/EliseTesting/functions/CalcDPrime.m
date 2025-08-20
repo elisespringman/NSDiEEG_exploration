@@ -1,7 +1,6 @@
-%This function calculates d' between one folder, subject, or electrode and
-%all others input
-
+%This function calculates d' between one folder and all other
 %This is meant for more than two folders
+%Don't use this anymore - now I used the two folder code
 
 %Can be adjusted to do comparisons between electrodes and subjects too by
 %exchanging j's for i's or n's
@@ -44,7 +43,7 @@ m = 0;
 %This is currently set to compare across folders (change j's to n's or i's
 %to change to comparing across subjects or electrodes
 
-%First loop goes from 1 to folder selected
+%First loop goes from first folder to folder selected
 while j ~= j_1 && j < j_max
     m = 0;
     m = m + dMeanresults(i, j);
@@ -54,7 +53,7 @@ end
 while j == j_1
     j = j + 1;
 end
-%Last loop goes from selected folder to the end
+%Last loop goes from selected folder to the last folder
 while j ~= j_1 && j < j_max 
     m = m + dMeanresults(i, j);
     j = j + 1;
@@ -73,7 +72,7 @@ j = j_1;
 %Sets s for loops
 s = 0;
 
-%First loop goes from 1 to folder selected
+%First loop goes from first folder to folder selected
 while j ~= j_1 && j < j_max
     s = 0;
     s = s + ((variresults(i, j)));
@@ -83,16 +82,17 @@ end
 while j == j_1
     j = j + 1;
 end
-%Last loop goes from selected folder to the end
+%Last loop goes from selected folder to the last folder
 while j ~= j_1 && j < j_max
     s = s + ((variresults(i, j)));
     j = j + 1;
 end
 
+%Calculates the denominator
 denominator = sqrt(0.5*(((vari_1)) + (1/N)*s));
 
 %% Final d' calculation 
 
-%This calculates the values of d'
+%This calculates and outputs the value of d'
 Dprime = numerator/denominator;
 Dprime

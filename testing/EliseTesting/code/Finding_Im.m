@@ -1,6 +1,10 @@
 %% Input an image number and the program will output which of the listed electrodes had the image in its top 20 images
 %Uses sections of code from BB_withFigures written by Morgan and Lupita
 %Allows me to locate common images amongst a greater list of electrodes
+
+%This program was used to get an overview of broadband responses early on
+%in the project
+%It wasn't used in the primary analysis process
 %% Creating Path
 
 localDataPath = setLocalDataPath(1);
@@ -78,7 +82,7 @@ for cc = 1:length(channels)
             maxim_idx1000 = [maxim_idx1000 im_idx1000(i)]; 
        end
        
-        %if the image number appears in the list of the top 10 images of an
+        %If the image number appears in the list of the top 10 images of an
         %electrode, it will display the electrodes name
        if ismember(im_num, maxim_idx1000)
            disp(channel)

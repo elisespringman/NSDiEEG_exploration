@@ -1,7 +1,7 @@
-%Variation of the original d' function
+%Variation of the original CalcDPrime function
 %Simplified for two item comparions
 
-%This function calculates d' between two folders, subjects, or electrodes
+%This function calculates d' between two folders
 
 %Can be adjusted to do comparisons between electrodes and subjects too by
 %exchanging j's for i's or n's
@@ -27,6 +27,6 @@ numerator = dMeanresults(i, j_1, n) - dMeanresults(i, j, n);
 %Calculates the denominator
 denominator = sqrt(0.5*(vari_1 + variresults(i, j, n)));
 
-%This calculates the values of d'
+%This calculates and outputs the values of d'
 Dprime = numerator/denominator;
 Dprime

@@ -20,7 +20,7 @@ NotFolder = 0;
 allElectrode = 0;
 
 % 1 to plot BB values, 0 to skip
-plotBBvalues = 1;
+plotBBvalues = 0;
 graphttmin = -0.1;
 graphttmax = 0.8;
 
@@ -29,37 +29,31 @@ findmean = 1;
 meanttmin = 0;
 meanttmax = 0.8;
 
+%Sets bounds for d' and ttest calculations
+dmin = 0.4;
+dmax = 0.8;
+
 %folder to be averaged
-folderName = {'Food5', 'Random5'};
+folderName = {'Food_OG', 'Random_OG'};
 
 %Subject to be used
-subject = {'20', '02'};                      
+subject = {'05', '12', '13'};                      
 
 %Channels to be tested
-channel = ["LC2", "RC4", "LT2"];
+channel = ["RA1", "RA2", "RA3", "RA4", "RA5", "RA6", "RA7", "RA8"...
+    "RB1", "RB2", "RB3", "RB4", "RB5", "RB6", "RB7" ...
+    "RC1", "RC2", "RC3", "RC4", "RC5", "RC6", ...
+    "RD1", "RD2", "RD3", "RD4", "RD5", "RD6"];
 
 %Establishes plot options
 colors = {'-r', '-b', '-c', '-m'};
 dashed = {'-+r', '-+b', '-+c', '-+m'};
 legendColors = {[1 0 0], [0 0 1], [0 1 1], [1 0 1]};  % Red, blue, cyan, magenta
-    
-% "LOC3", "LOC4", "LOC5"};
-
-%{
-{"LG6", "LG7", "LG8", "LB6", "LB7", "LB8", "LC2" ...
-    "LC6", "LC7", "LT6", "LT7", "LT8", "LT9", ...
-    "LOC6", "LOC7", "LOC8" }; 
-%}
 
 %Stores results, column 1 is avg and column 2 is peak
 %results = zeros(length(channel), 2);
 meanresults = zeros(length(channel), length(folderName));
 peakresults = zeros(length(channel), length(folderName));
-
-
-% Maximum time to be plotted (mean is between 0 and 0.2)
-%ttmax = 0.8;
-%ttmin = -0.1;
 
 
 
@@ -84,7 +78,8 @@ for n = 1:length(subject) %Loop for subjects
     load(dataFitName)
     
     for i = 1:length(channel) %Loop for electrodes
-           
+        
+        %Sets current electrode
         currentchannel = channel{i};
         
         %Creates new graph for each electrode
@@ -97,56 +92,69 @@ for n = 1:length(subject) %Loop for subjects
             %Sets current folder to be input folderAverageBB
             currentFolder = folderName{j};
         
-            %Skips electrodes listed not within current subject
+            %Skips if current electrode listed  is not within current subject
             if ~contains(all_channels.name, currentchannel)
                 continue;
             end
             
             %Sets line color and marking to distiguish folders
-            if n == 1
-                currentcolor = colors{j};
-            elseif n == 2
-                currentcolor = dashed{j};
-            end
+            currentcolor = colors{j};
             
 
             % States which channel it is currently processing
             channelIdx = find(ismember([all_channels.name],currentchannel));
 
             %finds the mean and peak value between 0 and 0.2
-            [meanbb, peakbb, dMean, vari] = newFolderAverageBBfunction(localDataPath, currentFolder,...
-                currentsubject, channelIdx, graphttmin, graphttmax, meanttmin, meanttmax, NotFolder, plotBBvalues, findmean, ...
+            [meanbb, peakbb, dMean, vari, tsize, meanImages] = newFolderAverageBBfunction(localDataPath, currentFolder,...
+                currentsubject, channelIdx, graphttmin, graphttmax, dmin, dmax, meanttmin, meanttmax, NotFolder, plotBBvalues, findmean, ...
                 tt, all_channels, eventsST, Mbb_Norm_Run, currentcolor, currentchannel);
 
 
 
             % Stores then prints the mean calculated above
             meanresults(i,j,n)   = meanbb;
-
             fprintf(append('The mean from ', num2str(meanttmin), ' to ', num2str(meanttmax), 'is:'));
             meanbb
 
             % Stores then prints the peak calculated above
             peakresults(i,j,n)   = peakbb;
-
             fprintf(append('The peak from ', num2str(meanttmin), ' to ', num2str(meanttmax), 'is:'));
             peakbb
 
             %stdev = std(ttavgBB)
             %stdevresults(i, j, n) = stdev;
+            
+            %Stores and prints variance results
             vari
             variresults(i, j, n) = vari;
             
+            %Stores mean results used for d' calculation
             dMeanresults(i, j, n) = dMean;
+            
+            %Stores data needed for ttest
+            if j == 1
+                data1 = meanImages;
+            elseif j == 2
+                data2 = meanImages;
+            end
 
         end
         
         %Calculates d' only for electrodes within the current subject
         if (ismember(currentchannel, all_channels.name))
+            %Calculates d'
             [Dprime] = DPrimeTwoFolder(i, j, n, dMeanresults, variresults);
-            Prime(i, n) = Dprime;
+            Prime(i, n) = Dprime; %Stores d'
+            
+            %Calculates ttest
+            [h, p, ci, stats] = ttest(data1, data2);
+            tvalue(i, n) = stats.tstat; %Stores t value
+            pvalue(i, n) = p; %Stores p value
         elseif (~ismember(currentchannel, all_channels.name))
+            %Fills a zero is status is 0
             Prime(i, n) = 0;
+            tvalue(i, n) = 0;
+            pvalue(i, n) = 0;
         end
         
         
@@ -155,7 +163,7 @@ for n = 1:length(subject) %Loop for subjects
             % Create invisible dummy lines for the legend
         hold on;
         legendHandles = gobjects(length(folderName), 1);  % Preallocate graphics handles
-
+        
         for j = 1:length(folderName)
             legendHandles(j) = plot(nan, nan, '-', 'Color', legendColors{j}, 'LineWidth', 2);
         end
@@ -177,35 +185,7 @@ for n = 1:length(subject) %Loop for subjects
     
 end 
 
+%Flips vectors so they are easier to copy and paste
 rePrime = Prime';
-
-%Calculates d'
-%[Dprime] = CalcDPrime(i, j, n, meanresults, variresults);
-%Dprime
-
-%Adds a legend
-%if plotBBvalues == 1
-    %legend(folderName)
-%end
-
- %Add a legend to the plot - this doesn't always work right
-    if (allElectrode == 0) && (plotBBvalues == 1)
-        % Create invisible dummy lines for the legend
-    hold on;
-    legendHandles = gobjects(length(folderName), 1);  % Preallocate graphics handles
-
-    for j = 1:length(folderName)
-        legendHandles(j) = plot(nan, nan, '-', 'Color', legendColors{j}, 'LineWidth', 2);
-    end
-    
-    legend(legendHandles, folderName, 'Interpreter', 'none', 'FontSize', 20);
-    end 
-
-    
-    if (j == 2) && (ismember(currentchannel, all_channels.name))
-        %Calculates and prints d'
-        [Dprime] = DPrimeTwoFolder(i, j, n, dMeanresults, variresults);
-        Prime(i, n) = Dprime;
-    elseif (j == 2) && (~ismember(currentchannel, all_channels.name))
-        Prime(i, n) = 0;
-    end
+retvalue = tvalue';
+repvalue = pvalue';

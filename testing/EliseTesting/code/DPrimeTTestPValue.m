@@ -1,8 +1,10 @@
-%Using this code to calculate fixed d'
-%Calculates a bunch of d' values at once
+%Using this code to calculate a bunch of d', t, and p values at once
 
-%Similar to main funtions of newSingleSubjwithDPrime but this only
-%outputs d' values
+%Very similar to newSingleSubjwithDPrime
+%This code runs the same and uses a very similar function, but it skips the
+%plotting part
+%This code is setup to calculate for all channels rather than a list
+
 
 %% Creates Path
 
@@ -14,50 +16,31 @@ localDataPath = setLocalDataPath(1);
 
 
 % 0 for all images in folder, 1 for all images in the 1000 besides what is in this folder
-NotFolder = 0;  
+NotFolder = 0; 
 
-% 1 to plot BB values, 0 to skip
-plotBBvalues = 0;
-graphttmin = -0.1;
-graphttmax = 0.8;
+% bounds for d' and ttest calculation
+dmin = 0.4;
+dmax = 0.8;
 
 % 1 to find the mean of BB values over 0 to 0.2, 0 to skip
 findmean = 1; 
-meanttmin = 0.15;
-meanttmax = 0.4;
+meanttmin = 0.4;
+meanttmax = 0.8;
 
 %folder to be averaged
-folderName = {'Food', 'Random'};
+folderName = {'Food', 'Interactions'};
 
 %Subject to be used
-subject = {'13'};                      
+subject = {'21'};                      
 
+%Don't need this if calculating for all electrodes in a sub
 %Channels to be tested
-%channel = string({all_channels.name}); 
-
-
-
-%Establishes plot options
-colors = {'-b', '-r', '-c', '-m'};
-dashed = {'-+b', '-+r', '-+c', '-+m'};
-    
-% "LOC3", "LOC4", "LOC5"};
-
-%{
-{"LG6", "LG7", "LG8", "LB6", "LB7", "LB8", "LC2" ...
-    "LC6", "LC7", "LT6", "LT7", "LT8", "LT9", ...
-    "LOC6", "LOC7", "LOC8" }; 
-%}
+%channel = ["LC1", "LC2", "LC3", "LC4", "LC5"];
 
 %Stores results, column 1 is avg and column 2 is peak
 %results = zeros(length(channel), 2);
 %meanresults = zeros(length(channel), length(folderName));
 %peakresults = zeros(length(channel), length(folderName));
-
-
-% Maximum time to be plotted (mean is between 0 and 0.2)
-%ttmax = 0.8;
-%ttmin = -0.1;
 
 %n variable needed for DPrime function because this code uses one
 %suject
@@ -88,21 +71,24 @@ n = 1;
     
 %% 
 
+%Clears variables used in calculations so data doesn't get mixed
 clearvars dMeanresults
 clearvars variresults
 clearvars Prime
 clearvars rePrime
+clearvars pvalue
+clearvars repvalue
+clearvars tvalue
+clearvars retvalue
+clearvars meanImages
 
 
 for i = 1:length(all_channels.name) %Loop for electrodes
     %all_channel.name for all electrodes or channels for listed electrodes
-
+    %channel for specific list
 
     for j = 1:length(folderName) %Loop for folders
-
-        %Sets line color and marking to distiguish lines - this only
-        %distigushes between folders
-        currentcolor = colors{j};
+        
         
         %Sets current folder to be input folderAverageBB
         currentFolder = folderName{j};
@@ -113,17 +99,26 @@ for i = 1:length(all_channels.name) %Loop for electrodes
          
         
         %finds the mean and peak value between meanttmin and meanttmax
-        [meanbb, peakbb, dMean, vari] = newFolderAverageBBfunction(localDataPath, currentFolder,...
-            currentsubject, channelIdx, graphttmin, graphttmax, meanttmin, meanttmax, NotFolder, plotBBvalues, findmean, ...
-            tt, all_channels, eventsST, Mbb_Norm_Run, currentcolor, all_channels.name(i)); %currentchannel
-        
+        [meanbb, peakbb, dMean, vari, tsize, meanImages] = meanfunction(localDataPath, currentFolder,...
+            currentsubject, channelIdx,  dmin, dmax, meanttmin, meanttmax, NotFolder, findmean, ...
+            tt, all_channels, eventsST, Mbb_Norm_Run); %currentchannel
         
         %stdev = std(ttavgBB)
         %stdevresults(i, j, n) = stdev;
+        
+        %Stores and displays variance
         variresults(i, j) = vari;
         vari
         
+        %Stores mean used for d' calculations
         dMeanresults(i, j) = dMean;
+        
+        %Stores information needed to use MATLAB built in ttest function
+        if j == 1
+            data1 = meanImages;
+        elseif j == 2
+            data2 = meanImages;
+        end
         
     end 
     
@@ -132,14 +127,24 @@ for i = 1:length(all_channels.name) %Loop for electrodes
          continue
     elseif all_channels.status(i) == 1
         %Calculates and prints d'
-        [Dprime] = CalcDPrime(i, j, n, dMeanresults, variresults);
+        [Dprime] = DPrimeTwoFolder(i, j, n, dMeanresults, variresults);
          Prime(i) = Dprime;
+         
+         %Completes ttest
+        [h, p, ci, stats] = ttest(data1, data2);
+        tvalue(i) = stats.tstat; %Store t value
+        pvalue(i) = p; %Stores p value
+        
     end
     
     %Calculates and prints d' for all electrodes
     %[Dprime] = CalcDPrime(i, j, n, dMeanresults, variresults);
      %Prime(i) = Dprime;
+     
+     %Flips vectors so they are easier to copy and paste
      rePrime = Prime';
+     retvalue = tvalue';
+     repvalue = pvalue';
 end
 
         

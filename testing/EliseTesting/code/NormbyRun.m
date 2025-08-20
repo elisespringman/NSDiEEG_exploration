@@ -7,7 +7,7 @@ localDataPath = setLocalDataPath(1);
 %% Set variables
 
 %Subject to be used
-subject = {'02'};    
+subject = {'15'};    
 
 %Set subject
     subjects = {subject};
@@ -17,7 +17,8 @@ subject = {'02'};
     ss = 1;
     subj = subject{ss};
     currentsubject = subject{ss};
-    
+
+%Load original pre-proc data
 oldData = fullfile(localDataPath.input,'preproc-car', ['sub-' currentsubject],...
     ['sub-' currentsubject '_desc-preprocCARBB_ieeg.mat']);
 load(oldData)
@@ -33,8 +34,9 @@ sel_events = eventsST;
 Mbb_norm = log10(Mbb); 
 
 % Indicate the interval for baseline, used in normalization
-norm_int = find(tt>-.1 & tt<0);
+norm_int = find(tt>-.2 & tt<0);
 
+%Create Mbb matrix to fill
 Mbb_Norm_Run = zeros(size(Mbb_norm), 'single');
 
 % Normalize per run
@@ -51,4 +53,5 @@ for run_idx = 1:max(eventsST.tasknumber)
     Mbb_Norm_Run(:,:,this_run) = minus(Mbb_norm(:,:,this_run),mean(Mbb_norm(:,norm_int,trials_norm),[2 3],'omitnan'));
 end
 
+%Prints subject number to signal completion
 subj 

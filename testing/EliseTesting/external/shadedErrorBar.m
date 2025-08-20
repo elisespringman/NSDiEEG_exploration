@@ -1,3 +1,5 @@
+%This is an external function from the shadedErrorBar GitHub by raacampbell
+
 function varargout=shadedErrorBar(x,y,errBar,varargin)
 % generate continuous error bar area around a line plot
 %

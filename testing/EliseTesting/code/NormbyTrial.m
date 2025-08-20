@@ -7,17 +7,18 @@ localDataPath = setLocalDataPath(1);
 %% Set variables
 
 %Subject to be used
-subject = {'20'};    
+subject = {'06'};    
 
 %Set subject
     subjects = {subject};
     % Choose an analysis type:
-    desc_label = 'normalized_MbbPerRun'; %new normalized data
+    desc_label = 'New_Mbb_norm'; %new normalized data
      
     ss = 1;
     subj = subject{ss};
     currentsubject = subject{ss};
-    
+
+%Loads original pre-proc data    
 oldData = fullfile(localDataPath.input,'preproc-car', ['sub-' currentsubject],...
     ['sub-' currentsubject '_desc-preprocCARBB_ieeg.mat']);
 load(oldData)
@@ -35,13 +36,17 @@ Mbb_norm = log10(Mbb);
 norm_time_interval = find(tt>-.1 & tt<0);
 
 for ch=1:length([all_channels.name])
-
+    
+    %Channel
     currentChannel_idx = ch;
 
     for im=1:length(shared_idx)
-
+        
+        %Image number
         imageidxs = im;
         
+        %Prints image and channel number as it goes to keep track of
+        %progress
         if rem(im, 10) == 0
             ch
             im
@@ -59,7 +64,7 @@ for ch=1:length([all_channels.name])
         %subtracts the value of normalization from every value
         Mbb_norm_current = minus(Mbb_norm_image, mean_Mbb_norm);
 
-
+        %Puts information into new matrix
         New_Mbb_Norm(ch, :, im) = Mbb_norm_current;
 
     end
@@ -67,6 +72,7 @@ for ch=1:length([all_channels.name])
 
 end
 
+%Prints sub number to signal completion
 subj 
 
 %%

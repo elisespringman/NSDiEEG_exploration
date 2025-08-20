@@ -1,4 +1,4 @@
-%Written by Morgan and Lupita
+%Shared by Morgan and Lupita
 
 function [events_status,nsd_idx,shared_idx,nsd_repeats] = ieeg_nsdParseEvents(all_events)
 %

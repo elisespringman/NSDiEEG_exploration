@@ -1,13 +1,11 @@
-%Originally created by Annika
-%Adjusted and used by Elise
 
-%FOLDERAVERAGEBB displays a graph of the average broadbands of all the
-%images in a folder and returns those values
+%This simplifies newFolderAverageBBfunction to skip plotting things
+%For DPrimeTTestPValue
 
-function [meanavgBB,peakavgBB, dMean, vari, tsize, meanImages] = newFolderAverageBBfunction(localDataPath, ...
-    nameFolder, subjectcurrent, channelcurrent, graphtttmin, graphtttmax, dmin, dmax, ...
-    meanttmin, meanttmax, notf, plotBB, meanBB, ...
-    tt, all_channels, eventsST, New_Mbb_Norm, colors, titles, j)
+function [meanavgBB,peakavgBB, dMean, vari, tsize, meanImages] = meanfunction(localDataPath, ...
+    nameFolder, subjectcurrent, channelcurrent, dmin, dmax, ...
+    meanttmin, meanttmax, notf, meanBB, ...
+    tt, all_channels, eventsST, New_Mbb_Norm)
 %% Establishes needed data for given electrode and folder
 
     lclDataPath = localDataPath;
@@ -15,9 +13,6 @@ function [meanavgBB,peakavgBB, dMean, vari, tsize, meanImages] = newFolderAverag
     subject=subjectcurrent; %Subject to be used
     channel = channelcurrent; %Channel to be used
     NotFolder = notf; % 0 for all images in folder, 1 for all images in the 1000 besides what is in this folder,
-    
-    %plots values from graphttmin to graphttmax
-    plotBBvalues = plotBB; % 1 to plot BB values, 0 to skip
     
     %takes mean from meanttmin to meanttmax
     findmean = meanBB; % 1 to find the mean of BB values over 0 to 0.2, 0 to skip
@@ -71,49 +66,6 @@ function [meanavgBB,peakavgBB, dMean, vari, tsize, meanImages] = newFolderAverag
     %Finds the shared_idx in the order of images shown
     imageNumberShown = find((ismember(shared_idx1000', sharedimageidxs)));
     
-    %Plotting broadband signal
-    if plotBBvalues == 1
-        graphSEM = [];
-       
-       
-        %Time interval used for plotting
-        ttt = tt(tt>=graphtttmin & tt<=graphtttmax);
-        
-        %Finds all the BBValues of the images in the folder
-        BBvalues = [];
-        for i = 1:length(imageNumberShown)
-            BBvalues(:, i) = AllBBValuesReduced(:,imageNumberShown(i));
-        end
-        
-        %Cuts the broadband values for the images to the time frame needed
-        %Used to calculate standard error
-        ttBBvalues = BBvalues((tt>=graphtttmin & tt<=graphtttmax), :);
-        
-        %Calulcates the standard error of the mean
-        graphSEM = zeros(1, length(ttt));
-        for i = 1:length(ttt)
-            graphSEM(1,i)=(std(ttBBvalues(i,:), 'omitnan'))/sqrt(length(ttBBvalues(i,:)));
-        end
-        
-        
-        %Averages all of the BBValues of the images in the folder
-        %Means across all images at a given timepoint together
-        avgBB = mean(BBvalues,2, 'omitnan');
-        
-        %Cuts avgBB down to correct time window
-        ttavgBB = avgBB(tt>=graphtttmin & tt<=graphtttmax);
-        
-        %Plotting details
-        plot(ttt, ttavgBB,'LineWidth',1);
-        set(gca, 'FontSize', 18)
-        shadedErrorBar(ttt, ttavgBB, graphSEM, 'lineprops', colors, 'patchSaturation', 0.15)
-        ylim([-0.2,1]); 
-        xlim([-0.1,0.8]); hold on;
-        
-        title([subjectcurrent, titles], 'FontSize', 24)
-        xlabel('Time(s)', 'FontSize', 22)
-        ylabel('Broadband Power (Signal Change)', 'Fontsize', 20); hold on;
-    end
 
     %Calculates the mean
     if findmean == 1
@@ -153,4 +105,3 @@ function [meanavgBB,peakavgBB, dMean, vari, tsize, meanImages] = newFolderAverag
   
   
 end
-
