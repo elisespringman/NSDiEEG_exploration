@@ -165,4 +165,14 @@ code, etc. The second main path I use is the "stimuli" path. This one takes
 me one step further than the "input" one and goes into my stimuli folder. This  
 is where I store my sorted folders, my overall 1000 images folder, etc. 
 
+## Future Ideas
+    
+    One possible future idea for this project include investigating the impact  
+of color on these patterns. One publication mentioned that some of these food  
+selecive regions align with color biased regions. It would be interesting to  
+see how this would affect our results.
 
+    Additionally, I think it would be good to continue to investigates areas  
+outside of the ventral visual cortex, as that is the region most publications  
+seem to focus on. With some possible findings elsewhere with this project,  
+understanding these other areas could be beneicial.
